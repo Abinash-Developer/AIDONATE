@@ -17,19 +17,20 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: function () {
-      return !this.isGoogleUser;
-    },
+    required:true,
+    // required: function () {
+    //   return !this.isGoogleUser;
+    // },
   },
-  googleId: {
-    type: String,
-    unique: true,
-    sparse: true,
-  },
-  isGoogleUser: {
-    type: Boolean,
-    default: false,
-  },
+  // googleId: {
+  //   type: String,
+  //   unique: true,
+  //   sparse: true,
+  // },
+  // isGoogleUser: {
+  //   type: Boolean,
+  //   default: false,
+  // },
   role: {
     type: String,
     enum: ["admin", "user"],
@@ -47,7 +48,8 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password") || this.isGoogleUser) {
+  // if (!this.isModified("password") || this.isGoogleUser) {
+    if (!this.isModified("password")) {
     return next();
   }
   this.password = await bcrypt.hash(this.password, 12);
