@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required:true,
+    required: true,
     // required: function () {
     //   return !this.isGoogleUser;
     // },
@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", async function (next) {
   // if (!this.isModified("password") || this.isGoogleUser) {
-    if (!this.isModified("password")) {
+  if (!this.isModified("password")) {
     return next();
   }
   this.password = await bcrypt.hash(this.password, 12);
