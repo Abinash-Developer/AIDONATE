@@ -6,6 +6,10 @@ const adminController = require("../controllers/adminController");
 const categoryController = require("../controllers/categoryController");
 
 router.post("/login", authController.login);
+router.get(
+  "/get_category",
+  categoryController.getCategory
+);
 router.use(authMiddleware.protect);
 router.post(
   "/get_user",
@@ -19,5 +23,6 @@ router.post(
   authMiddleware.restrictTo("admin"),
   categoryController.addCategory
 );
+
 
 module.exports = router;

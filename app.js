@@ -10,7 +10,6 @@ connectDB();
 const port = process.env.PORT || 5555;
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
 app.use("/users", USERROUTE);
 app.use("/admin", ADMINROUTE);
 

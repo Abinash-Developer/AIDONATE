@@ -18,4 +18,15 @@ const addCategory = async (req, res) => {
       .json({ message: "An error occurred while adding the category" });
   }
 };
-module.exports = { addCategory };
+
+const getCategory = async (req,res)=>{
+  try{
+     const allCategory = await Category.find({});
+     sendSuccessResponse(res, allCategory, "Category added successfully");
+  }catch(error){ 
+    res
+    .status(500)
+    .json({ message: "An error occurred while getting the category" });
+  }
+}
+module.exports = { addCategory,getCategory };

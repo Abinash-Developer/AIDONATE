@@ -14,13 +14,20 @@ const userSignIn = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      sendBadRequestResponse(res, "Please provide username and password!", 400);
+      return res.status(400).json({
+        status: false,
+        message: "Please provide username and password!",
+      });
     }
 
     const user = await User.findOne({ email }).select("+password");
     if (!user || !(await user.correctPassword(password, user.password))) {
-      sendBadRequestResponse(res, "Incorrect username or password", 401);
+      return res.status(401).json({
+        status: false,
+        message: "Incorrect username or password",
+      });
     }
+
     const token = signToken(user._id);
     res.status(200).json({
       status: true,
@@ -31,10 +38,11 @@ const userSignIn = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
+
 const signToken = (id) => {
   return jwt.sign({ id }, "aidonate", { expiresIn: "1d" });
 };
