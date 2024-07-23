@@ -6,24 +6,58 @@ const signToken = (id) => {
 };
 
 exports.signup = async (req, res) => {
-  try {
-    const { email, password, role } = req.body;
-    const newUser = await User.create({ email, password, role });
-
-    const token = signToken(newUser._id);
-    res.status(201).json({
-      status: "success",
-      token,
-      data: {
-        user: newUser,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err,
-    });
-  }
+  console.log(req.body)
+  // try {
+  //   const {
+  //     first_name,
+  //     last_name,
+  //     phoneNumber,
+  //     country,
+  //     state,
+  //     district,
+  //     pinCode,
+  //     ngoGovtId,
+  //     ngoName,
+  //     status,
+  //     email,
+  //     password,
+  //     role,
+  //   } = req.body;
+  //   const newUser = await User.create({
+  //     first_name,
+  //     last_name,
+  //     phoneNumber,
+  //     country,
+  //     state,
+  //     district,
+  //     pinCode,
+  //     ngoGovtId,
+  //     ngoName,
+  //     status,
+  //     email,
+  //     password,
+  //     role,
+  //   });
+  //   const token = signToken(newUser._id);
+  //   console.log(token);
+  //   const existingUser = await User.findOne({ email: email });
+  //   if (existingUser) {
+  //     res.status(200).json({ exists: true, message: "Email already exists" });
+  //   } else {
+  //     res.status(201).json({
+  //       status: "success",
+  //       token,
+  //       data: {
+  //         user: newUser,
+  //       },
+  //     });
+  //   }
+  // } catch (err) {
+  //   res.status(400).json({
+  //     status: "fail",
+  //     message: err,
+  //   });
+  // }
 };
 
 exports.login = async (req, res) => {

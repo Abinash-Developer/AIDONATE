@@ -12,6 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/users", USERROUTE);
 app.use("/admin", ADMINROUTE);
+// app.get("/", (req, res) => res.send("Hello World"));
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

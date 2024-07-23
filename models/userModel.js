@@ -1,51 +1,68 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
-  first_name: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    first_name: {
+      type: String,
+      required: false,
+    },
+    last_name: {
+      type: String,
+      required: false,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: false,
+    },
+    country: {
+      type: String,
+      required: true,
+      enum: ["India", "OutsideIndia"],
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    district: {
+      type: String,
+      required: true,
+    },
+    pinCode: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user", "ngo"],
+      default: "user",
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+    ngoGovtId: {
+      type: String,
+      required: false,
+    },
+    ngoName: {
+      type: String,
+      required: false,
+    },
   },
-  last_name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    // required: function () {
-    //   return !this.isGoogleUser;
-    // },
-  },
-  // googleId: {
-  //   type: String,
-  //   unique: true,
-  //   sparse: true,
-  // },
-  // isGoogleUser: {
-  //   type: Boolean,
-  //   default: false,
-  // },
-  role: {
-    type: String,
-    enum: ["admin", "user"],
-    default: "user",
-  },
-  status: {
-    type: String,
-    enum: ["active", "inactive"],
-    default: "active",
-  },
-  created_at: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 userSchema.pre("save", async function (next) {
   // if (!this.isModified("password") || this.isGoogleUser) {
