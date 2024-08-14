@@ -1,40 +1,65 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const Schema = mongoose.Schema;
 
 const userSchema = new mongoose.Schema({
   first_name: {
     type: String,
-    required: true,
+    required: false,
   },
   last_name: {
     type: String,
-    required: true,
+    required: false,
+  },
+  ngogovtId: {
+    type: String,
+    required: false,
+  },
+  ngoname: {
+    type: String,
+    required: false,
   },
   email: {
     type: String,
     required: true,
     unique: true,
   },
+  phoneNumber: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  country: {
+    type: String,
+    enum: ["india", "outindia"],
+    default: "india",
+  },
+  state: {
+    type: Schema.Types.ObjectId,
+    ref: "state",
+    required: true
+  },
+  district: {
+    type: Schema.Types.ObjectId,
+    ref:'city',
+    required: true
+  },
+  pincode: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true,
-    // required: function () {
-    //   return !this.isGoogleUser;
-    // },
   },
-  // googleId: {
-  //   type: String,
-  //   unique: true,
-  //   sparse: true,
-  // },
-  // isGoogleUser: {
-  //   type: Boolean,
-  //   default: false,
-  // },
   role: {
     type: String,
-    enum: ["admin", "user"],
+    enum: ["admin", "user", "ngo"],
     default: "user",
+  },
+  ngoFiles:{
+   type: [String],
+   required:false,
   },
   status: {
     type: String,
@@ -47,8 +72,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ phoneNumber: 1 }, { unique: true });
+
 userSchema.pre("save", async function (next) {
-  // if (!this.isModified("password") || this.isGoogleUser) {
   if (!this.isModified("password")) {
     return next();
   }

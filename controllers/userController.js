@@ -2,14 +2,51 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const {
   sendSuccessResponse,
-  sendBadRequestResponse,
+  handleMongoError,
 } = require("../helpers/responseHelper");
-
-const userRegister = async (req, res) => {
-  let user = new User(req.body);
-  const registerDetail = await user.save();
-  sendSuccessResponse(res, registerDetail, "User registered successfully");
+const ngoRegister = async (req, res) => {
+  try {
+    ngoFiles = [];
+    req.files.forEach((element) => {
+      ngoFiles.push(element.filename);
+    });
+    var user = new User({
+      ngogovtId: req.body.ngoGovtId,
+      ngoname: req.body.ngoName,
+      email: req.body.email,
+      phoneNumber: req.body.phone,
+      state: req.body.state,
+      district: req.body.district,
+      pincode: req.body.pinCode,
+      password: req.body.password,
+      role: req.body.role,
+      ngoFiles: ngoFiles,
+    });
+    const registerResponse = await user.save();
+    sendSuccessResponse(res, registerResponse, "Ngo registered successfully");
+  } catch (error) {
+    handleMongoError(error, res);
+  }
 };
+const userRegister = async (req,res)=>{
+  try{
+    var user = new User({
+      first_name: req.body.firstName,
+      last_name: req.body.lastName,
+      email: req.body.email,
+      phoneNumber: req.body.phone,
+      state: req.body.state,
+      district: req.body.district,
+      pincode: req.body.pinCode,
+      password:req.body.password,
+      role:req.body.role,
+    });
+    const registerResponse = await user.save();
+    sendSuccessResponse(res, registerResponse, "user registered successfully");
+  }catch(error){
+    handleMongoError(error, res);
+  }
+}
 const userSignIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -48,6 +85,7 @@ const signToken = (id) => {
 };
 
 module.exports = {
+  ngoRegister,
   userRegister,
   userSignIn,
 };

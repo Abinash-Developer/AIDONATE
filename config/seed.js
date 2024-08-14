@@ -4,7 +4,7 @@ const City = require("../models/city");
 const state_city = require("./state_city.json");
 mongoose
   .connect(
-    "mongodb+srv://abinashupwork:05eW12AU4yobTR5u@cluster0.qhy1cum.mongodb.net/aidonate",
+    "mongodb+srv://abinashupwork:05eW12AU4yobTR5u@cluster0.qhy1cum.mongodb.net/aidonate07",
     {
       serverSelectionTimeoutMS: 300000,
       socketTimeoutMS: 450000,
