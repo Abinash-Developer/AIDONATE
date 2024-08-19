@@ -1,0 +1,86 @@
+<%- include('../../layouts/main') %>
+<div class="content-wrap">
+    <div class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-8 p-r-0 title-margin-right">
+                    <div class="page-header">
+                        <div class="page-title">
+                            <h1>Hello, <span>Welcome Here</span></h1>
+                        </div>
+                    </div>
+                </div>
+                <!-- /# column -->
+                <div class="col-lg-4 p-l-0 title-margin-left">
+                    <div class="page-header">
+                        <div class="page-title">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Category</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /# column -->
+            </div>
+            <!-- /# row -->
+            <section id="main-content">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-title">
+                                <h4>Category</h4> 
+                            </div>
+                            <div class="bootstrap-data-table-panel">
+                                <div class="table-responsive">
+                                    <table id="row-select" class="display table table-borderd table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>IMAGE</th>
+                                                <th>NAME</th>
+                                                <th>DESCRIPTION</th>
+                                                <th>STATUS</th>
+                                            </tr>
+                                        </thead>
+                                         <% categories.map((category)=>{%>
+                                              <tr>
+                                                <td> <img src="uploads/<%= category.image %>" alt=""></td>
+                                                <td><%= category.name %></td>
+                                                <td><%= category.description.substring(0,100) %></td>
+                                                <% if(category.status == 'active'){%>
+                                                    <td>
+                                                        <a href="/categories/<%= category._id %>" class="btn btn-rounded btn-primary">VIEW</a>
+                                                        <a href="/categories/edit/<%= category._id %>" class="btn btn-rounded btn-secondary">EDIT</a>
+                                                        <a href="" class="btn btn-rounded btn-success">ACTIVE</a>
+                                                    </td>
+                                                <%}else{%>
+                                                    <td>
+                                                        <a href="">DEACTIVE</a>
+                                                    </td>
+                                                <%}%>
+                                              </tr> 
+                                          <% }) %>
+                                        <tbody>
+                                          
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /# card -->
+                    </div>
+                    <!-- /# column -->
+                </div>
+                <!-- /# row -->
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="footer">
+                            <p>2018 © Admin Board. - <a href="#">example.com</a></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

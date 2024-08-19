@@ -38,7 +38,7 @@ const checkEmail = async (req, res) => {
     } else {
       return res
         .status(404)
-        .json({ success: false, message: "User not found." });
+        .json({ success: false, message: "Email does not exist" });
     }
   } catch (error) {
     console.error(error);

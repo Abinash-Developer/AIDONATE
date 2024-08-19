@@ -57,10 +57,6 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "user", "ngo"],
     default: "user",
   },
-  ngoFiles:{
-   type: [String],
-   required:false,
-  },
   status: {
     type: String,
     enum: ["active", "inactive"],

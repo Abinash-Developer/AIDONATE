@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const UserMeta = require("../models/userMetaModel");
 const jwt = require("jsonwebtoken");
 const {
   sendSuccessResponse,
@@ -19,10 +20,13 @@ const ngoRegister = async (req, res) => {
       district: req.body.district,
       pincode: req.body.pinCode,
       password: req.body.password,
-      role: req.body.role,
-      ngoFiles: ngoFiles,
+      role: req.body.role
     });
     const registerResponse = await user.save();
+    const metaData = {
+      documents: ngoFiles,
+    };
+    await saveUserMeta(registerResponse._id, metaData);
     sendSuccessResponse(res, registerResponse, "Ngo registered successfully");
   } catch (error) {
     handleMongoError(error, res);
@@ -80,6 +84,15 @@ const userSignIn = async (req, res) => {
   }
 };
 
+const saveUserMeta = async (userId, metaData) => {
+  const metaEntries = Object.keys(metaData).map(key => ({
+    meta_id: userId,
+    meta_key: key,
+    meta_value: JSON.stringify(metaData[key]),
+  }));
+
+  await UserMeta.insertMany(metaEntries);
+};
 const signToken = (id) => {
   return jwt.sign({ id }, "aidonate", { expiresIn: "1d" });
 };

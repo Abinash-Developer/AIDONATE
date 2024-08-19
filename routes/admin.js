@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../utils/upload");
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminController = require("../controllers/adminController");
@@ -20,7 +21,7 @@ router.post(
 //Category routes
 router.post(
   "/add_categry",
-  authMiddleware.restrictTo("admin"),
+  authMiddleware.restrictTo("admin"),upload.singleFileUpload('image'),
   categoryController.addCategory
 );
 
