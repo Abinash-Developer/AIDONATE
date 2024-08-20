@@ -33,16 +33,18 @@ const ngoRegister = async (req, res) => {
   }
 };
 const userRegister = async (req,res)=>{
+  // console.log(req.body);
+  // return;
   try{
     var user = new User({
-      first_name: req.body.firstName,
-      last_name: req.body.lastName,
-      email: req.body.email,
-      phoneNumber: req.body.phone,
-      state: req.body.state,
-      district: req.body.district,
-      pincode: req.body.pinCode,
-      password:req.body.password,
+      first_name: req.body.firstName || req.body.firstName,
+      last_name: req.body.lastName || req.body.lastName,
+      email: req.body.email || req.body.email,
+      phoneNumber: req.body.phone || req.body.phone,
+      state: req.body.state || req.body.state,
+      district: req.body.district || req.body.district,
+      pincode: req.body.pinCode || req.body.pinCode,
+      password:req.body.password || req.body.password,
       role:req.body.role,
     });
     const registerResponse = await user.save();
@@ -97,8 +99,20 @@ const signToken = (id) => {
   return jwt.sign({ id }, "aidonate", { expiresIn: "1d" });
 };
 
+
+// NGO SECTION
+const getNgo = async (req,res)=>{
+  try{
+   const ngos =  await User.find({$and:[{status:'active'},{role:'ngo'}]});
+   sendSuccessResponse(res, ngos, "Ngo's are fetched successfully");
+  } catch (error) {
+    sendErrorResponse(res, error, "Failed to fetch ngo's");
+  }
+}
+
 module.exports = {
   ngoRegister,
   userRegister,
   userSignIn,
+  getNgo
 };
