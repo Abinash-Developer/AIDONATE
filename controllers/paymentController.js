@@ -1,4 +1,9 @@
+const Payment = require("../models/paymentodel");
 const Razorpay = require('razorpay');
+const {
+  sendSuccessResponse,
+  handleMongoError,
+} = require("../helpers/responseHelper");
 const createOrder = async (req,res)=>{
     try {
         const instance = new Razorpay({
@@ -16,7 +21,21 @@ const createOrder = async (req,res)=>{
         res.status(500).json({ error: 'Something went wrong' });
       }
 }
-const createUser = async (req,res)=>{
-  console.log(req.body)
+const savePaymentDetail = async (req,res)=>{
+  console.log(req.body);
+  try{
+    var user = new Payment({
+      user_id: req.body.user_id,
+      charity_id: req.body.charity_id,
+      razorpay_payment_id: req.body.razorpay_payment_id,
+      razorpay_order_id: req.body.razorpay_order_id ,
+      razorpay_signature: req.body.razorpay_signature,
+      amount: req.body.amount
+    });
+    const paymentAddResponse = await user.save();
+    sendSuccessResponse(res, paymentAddResponse, "Payment Created successfully");
+  }catch(error){
+    handleMongoError(error, res);
+  }
 }
-module.exports = {createOrder,createUser}
+module.exports = {createOrder,savePaymentDetail}

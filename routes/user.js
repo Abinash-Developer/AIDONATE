@@ -26,6 +26,6 @@ router.get('/get_ngo',userController.getNgo);
 // Razorpay API code 
 
 router.post('/create-order',paymentController.createOrder);
-router.post('/register_user',paymentController.createUser);
+router.post('/save-paymet-details',paymentController.savePaymentDetail);
 
 module.exports = router;
