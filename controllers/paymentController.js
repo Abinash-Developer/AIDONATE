@@ -22,7 +22,6 @@ const createOrder = async (req,res)=>{
       }
 }
 const savePaymentDetail = async (req,res)=>{
-  console.log(req.body);
   try{
     var user = new Payment({
       user_id: req.body.user_id,

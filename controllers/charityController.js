@@ -2,7 +2,7 @@ const User = require('../models/userModel')
 const getAllCharity = async (req,res)=>{
     try{
         const ngos = await User.find({role:"ngo"}).populate('state').populate('district');
-        res.render('admin/charity',{"ngoresult":ngos});
+        res.render('admin/charity',{"ngoresult":ngos,currentRoute: 'charity' });
     }catch(error){
         console.log(error)    
     }

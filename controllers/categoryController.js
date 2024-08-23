@@ -37,7 +37,7 @@ const getCategory = async (req,res)=>{
 const fetchCategory = async(req,res)=>{
   try{
     const categories = await Category.find({});
-    res.render('admin/category/category',{categories});
+    res.render('admin/category/category',{categories,currentRoute: 'category' });
  }catch(error){ 
     res.render('admin/category/category',{ errorMessage: "An error occurred while getting the category" });
  }
@@ -45,7 +45,7 @@ const fetchCategory = async(req,res)=>{
 const getCategoryById = async (req,res)=>{
   try{
     const particularCategory = await Category.findOne({_id:req.params.id})
-    res.render('admin/category/singleCategory',{particularCategory});
+    res.render('admin/category/singleCategory',{particularCategory,currentRoute: 'category'});
   }catch(error){
     res.render('admin/category/singleCategory',{ errorMessage: "An error occurred while getting the category" });
   }
@@ -53,7 +53,7 @@ const getCategoryById = async (req,res)=>{
 const getCategoryByIdEdit = async (req,res)=>{
   try{
     const category = await Category.findOne({_id:req.params.id})
-    res.render('admin/category/editcategory',{category})
+    res.render('admin/category/editcategory',{category,currentRoute: 'category'})
   }catch(error){
     res.render('admin/category/editcategory',{ errorMessage: "An error occurred while getting the category" });
   }

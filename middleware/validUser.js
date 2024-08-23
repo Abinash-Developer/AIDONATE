@@ -5,10 +5,10 @@ const validUserMiddleware = (req, res, next) => {
         if (userData.role === 'admin') {
             next();
         } else {
-            return res.status(403).json({ message: 'Access denied. Admins only.' });
+         res.redirect('login');
         }
     } catch (err) {
-        return res.status(401).json({ message: 'Invalid token. Access denied.' });
+         res.redirect('login');
     }
 };
 

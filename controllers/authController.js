@@ -9,7 +9,6 @@ exports.signup = async (req, res) => {
   try {
     const { email, password, role } = req.body;
     const newUser = await User.create({ email, password, role });
-
     const token = signToken(newUser._id, newUser.role);
     res.status(201).json({
       status: "success",
@@ -57,3 +56,13 @@ exports.login = async (req, res) => {
     });
   }
 };
+exports.logout = async (req,res)=>{
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).send('Error logging out');
+    }
+    res.clearCookie('connect.sid');
+    res.render('login')
+  });
+}
