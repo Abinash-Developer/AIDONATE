@@ -37,7 +37,6 @@ const getCategory = async (req,res)=>{
 const fetchCategory = async(req,res)=>{
   try{
     const categories = await Category.find({});
-    console.log(categories);
     res.render('admin/category/category',{categories});
  }catch(error){ 
     res.render('admin/category/category',{ errorMessage: "An error occurred while getting the category" });

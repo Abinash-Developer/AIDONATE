@@ -84,17 +84,12 @@
                 },
                 submitHandler: function(form) {
                     $.ajax({
-                        url: '/path-to-your-login-api',
+                        url: '/admin/login',
                         type: 'POST',
                         data: $(form).serialize(),
                         success: function(response) {
-                            console.log(response);
-                            alert('Login successful!');
+                            window.location.href="http://localhost:5555/dashboard";
                         },
-                        error: function(xhr, status, error) {
-                            console.error(error);
-                            alert('Login failed. Please try again.');
-                        }
                     });
                 }
             });
