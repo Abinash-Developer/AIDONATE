@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const UserMeta = require("../models/userMetaModel");
+const Payment = require("../models/paymentodel");
 const jwt = require("jsonwebtoken");
 const {
   sendSuccessResponse,
@@ -102,12 +103,96 @@ const signToken = (id) => {
 
 // NGO SECTION
 const getNgo = async (req,res)=>{
+  console.log(req.query);
   try{
-   const ngos =  await User.find({$and:[{status:'active'},{role:'ngo'}]});
-   sendSuccessResponse(res, ngos, "Ngo's are fetched successfully");
+    if (date) {
+      sortOptions.created_at = date === 'asc' ? 1 : -1;
+    }
+  const ngos =  await User.find({$and:[{status:'active'},{role:'ngo'}]});
+  const sums = await Payment.aggregate([
+    {
+      $group: {
+        _id: '$charity_id',
+        totalAmount: { $sum: { $toDouble: '$amount' } }
+      }
+    }
+  ]);
+const paymentMap = {};
+sums.forEach(payment => {
+  paymentMap[payment._id.toString()] = payment.totalAmount;
+});
+var ngoArray = [];
+for (const ngo of ngos) {
+  const ngoObject = ngo.toObject();
+  const ngoId = ngoObject._id.toString(); 
+  if (paymentMap.hasOwnProperty(ngoId)) {
+      ngoObject.paymentAmount = paymentMap[ngoId];
+      const goalAmount = await UserMeta.findOne({
+        meta_id: ngoId,
+        meta_key: 'goal'
+      });
+      const goalValue = parseFloat(goalAmount.meta_value);
+      const amountPaid = parseFloat(ngoObject.paymentAmount);
+      var percentage = (amountPaid / goalValue) * 100;
+      ngoObject.percentage = parseInt(percentage); 
+  }else{
+     ngoObject.paymentAmount = 0;
+     ngoObject.percentage=0;
+  }
+  ngoArray.push(ngoObject);
+  console.log(ngoArray);
+}
+const sortOrder = req.query.price; // Change this to 'desc' for descending order
+
+ngoArray.sort((a, b) => {
+  if (sortOrder === 'asc') {
+    return a.paymentAmount - b.paymentAmount;
+  } else {
+    return b.paymentAmount - a.paymentAmount;
+  }
+});
+   sendSuccessResponse(res, ngoArray, "Ngo's are fetched successfully");
   } catch (error) {
     sendErrorResponse(res, error, "Failed to fetch ngo's");
   }
+}
+const getFilterResult = async ()=>{
+  const ngos =  await User.find({$and:[{status:'active'},{role:'ngo'}]});
+  const sums = await Payment.aggregate([
+    {
+      $group: {
+        _id: '$charity_id',
+        totalAmount: { $sum: { $toDouble: '$amount' } }
+      }
+    }
+  ]);
+const paymentMap = {};
+sums.forEach(payment => {
+  paymentMap[payment._id.toString()] = payment.totalAmount;
+});
+var ngoArray = [];
+for (const ngo of ngos) {
+  const ngoObject = ngo.toObject();
+  const ngoId = ngoObject._id.toString(); 
+  if (paymentMap.hasOwnProperty(ngoId)) {
+      ngoObject.paymentAmount = paymentMap[ngoId];
+      const goalAmount = await UserMeta.findOne({
+        meta_id: ngoId,
+        meta_key: 'goal'
+      });
+      const goalValue = parseFloat(goalAmount.meta_value);
+      const amountPaid = parseFloat(ngoObject.paymentAmount);
+      var percentage = (amountPaid / goalValue) * 100;
+      ngoObject.percentage = parseInt(percentage); 
+  }else{
+     ngoObject.paymentAmount = 0;
+     ngoObject.percentage=0;
+  }
+  ngoArray.push(ngoObject);
+}
+console.log(ngoArray);
+
+  // console.log(sums);
 }
 
 module.exports = {

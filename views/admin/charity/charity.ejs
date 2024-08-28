@@ -1,4 +1,4 @@
-<%- include('../layouts/main') %>
+<%- include('../../layouts/main') %>
 <div class="content-wrap">
     <div class="main">
         <div class="container-fluid">
@@ -61,8 +61,8 @@
                                                 <td><%= ngoresult[i].district.name %></td>
                                                 <td><%= ngoresult[i].pincode %></td>
                                                 <td>
-                                                    <button type="button" class="btn btn-rounded btn-primary">EDIT</button>
-                                                    <button type="button" class="btn btn-rounded btn-secondary">VIEW</button>
+                                                    <a href="/charity/<%= ngoresult[i]._id %>" class="btn btn-rounded btn-primary">EDIT</a>
+                                                    <a href="" class="btn btn-rounded btn-secondary">VIEW</a>
                                                 <% if(ngoresult[i].status == 'active'){%>
                                                      <button type="button" class="btn btn-rounded btn-success" data-id="<%= ngoresult[i]._id%>" onclick="deActivateCharity(this)">DEACTIVE</button>
                                                 <% }else{%>

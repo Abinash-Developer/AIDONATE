@@ -16,6 +16,8 @@ router.get('/dashboard',checkUser,(req, res) => {
 router.get('/charity',charityController.getAllCharity);
 router.get('/deactivate-charity/:id',charityController.deactivateCharity);
 router.get('/activate-charity/:id',charityController.activateCharity);
+router.get('/charity/:id',charityController.fetchCategoryForEdit);
+router.post('/charity/update',upload.singleFileUpload('image'),charityController.updateCharity);
 
 
 // category section
@@ -27,5 +29,8 @@ router.post('/categories/update/',upload.singleFileUpload('image'),categoryContr
 router.get('/settings', (req, res) => {
     res.render('admin/settings', { title: 'Settings' });
 });
+
+//State and City route
+router.get('/city/:id',charityController.getCity);
 
 module.exports = router;
