@@ -103,12 +103,26 @@ const signToken = (id) => {
 
 // NGO SECTION
 const getNgo = async (req,res)=>{
-  console.log(req.query);
   try{
-    if (date) {
-      sortOptions.created_at = date === 'asc' ? 1 : -1;
-    }
-  const ngos =  await User.find({$and:[{status:'active'},{role:'ngo'}]});
+    const date = req.query.date ? new Date(req.query.date) : null;
+    const ngos = await User.find({
+      $and:  [
+        { status: 'active' },
+        { role: 'ngo' },
+        ...(req.query.date
+          ? [
+              {
+                $expr: {
+                  $eq: [
+                    { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
+                    req.query.date
+                  ]
+                }
+              }
+            ]
+          : [])
+      ]
+    });
   const sums = await Payment.aggregate([
     {
       $group: {
@@ -140,9 +154,8 @@ for (const ngo of ngos) {
      ngoObject.percentage=0;
   }
   ngoArray.push(ngoObject);
-  console.log(ngoArray);
 }
-const sortOrder = req.query.price; // Change this to 'desc' for descending order
+const sortOrder = req.query.price;
 
 ngoArray.sort((a, b) => {
   if (sortOrder === 'asc') {
@@ -155,44 +168,6 @@ ngoArray.sort((a, b) => {
   } catch (error) {
     sendErrorResponse(res, error, "Failed to fetch ngo's");
   }
-}
-const getFilterResult = async ()=>{
-  const ngos =  await User.find({$and:[{status:'active'},{role:'ngo'}]});
-  const sums = await Payment.aggregate([
-    {
-      $group: {
-        _id: '$charity_id',
-        totalAmount: { $sum: { $toDouble: '$amount' } }
-      }
-    }
-  ]);
-const paymentMap = {};
-sums.forEach(payment => {
-  paymentMap[payment._id.toString()] = payment.totalAmount;
-});
-var ngoArray = [];
-for (const ngo of ngos) {
-  const ngoObject = ngo.toObject();
-  const ngoId = ngoObject._id.toString(); 
-  if (paymentMap.hasOwnProperty(ngoId)) {
-      ngoObject.paymentAmount = paymentMap[ngoId];
-      const goalAmount = await UserMeta.findOne({
-        meta_id: ngoId,
-        meta_key: 'goal'
-      });
-      const goalValue = parseFloat(goalAmount.meta_value);
-      const amountPaid = parseFloat(ngoObject.paymentAmount);
-      var percentage = (amountPaid / goalValue) * 100;
-      ngoObject.percentage = parseInt(percentage); 
-  }else{
-     ngoObject.paymentAmount = 0;
-     ngoObject.percentage=0;
-  }
-  ngoArray.push(ngoObject);
-}
-console.log(ngoArray);
-
-  // console.log(sums);
 }
 
 module.exports = {
