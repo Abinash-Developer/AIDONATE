@@ -33,6 +33,10 @@ const paymentSchema = new Schema({
     enum:["charity","campaigns"],
     default:"charity",
   },
+  invoiceNumber: {
+     type: String,
+     required: true
+   },
   created_at: {
     type: Date,
     default: Date.now,

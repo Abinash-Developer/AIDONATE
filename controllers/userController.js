@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const UserMeta = require("../models/userMetaModel");
 const Payment = require("../models/paymentodel");
+const Wishlist = require("../models/wishlistModel");
 const jwt = require("jsonwebtoken");
 const {
   sendSuccessResponse,
@@ -169,10 +170,44 @@ ngoArray.sort((a, b) => {
     sendErrorResponse(res, error, "Failed to fetch ngo's");
   }
 }
+const getUserDetail = async (req,res)=>{
+  try{
+    const userDetail = await User.findOne({_id:req.userId});
+    sendSuccessResponse(res, userDetail, "userDetail fetched successfully");
+  }catch(error){
+    sendErrorResponse(res, error, "Failed to fetch user");
+  }
+}
+const addToWishlist = async (req,res)=>{
+  const  ngo_id  = req.params.id;
+  const user_id = req.userId;
+  try {
+    const newWishlistItem = new Wishlist({
+      user_id,
+      ngo_id,
+    });
+    const savedWishlist = await newWishlistItem.save();
+    sendSuccessResponse(res, savedWishlist, "Wishlist saved successfully");
+  } catch (error) {
+    sendErrorResponse(res, error, "Failed to saved wishlist");
+  }
+}
 
+
+const getDonationHistory = async(req,res)=>{
+  try{
+    const donationHistory = await Payment.find({user_id:req.params.id}).populate('charity_id');
+    sendSuccessResponse(res, donationHistory, "Donation History fetched successfully");
+  }catch(error){
+    sendErrorResponse(res, error, "Failed to fetch user");
+  }
+}
 module.exports = {
   ngoRegister,
   userRegister,
   userSignIn,
-  getNgo
+  getNgo,
+  getUserDetail,
+  addToWishlist,
+  getDonationHistory
 };
