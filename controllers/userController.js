@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const {
   sendSuccessResponse,
   handleMongoError,
+  sendErrorResponse
 } = require("../helpers/responseHelper");
 const ngoRegister = async (req, res) => {
   try {
@@ -202,6 +203,22 @@ const getDonationHistory = async(req,res)=>{
     sendErrorResponse(res, error, "Failed to fetch user");
   }
 }
+const fetchWishlistByUser = async (req,res)=>{
+  try{
+    const wishlist = await Wishlist.find({user_id:req.userId})
+    sendSuccessResponse(res, wishlist, "Wishlist fetched successfully");
+  }catch(error){
+    sendErrorResponse(res, error, "Wishlist failed to fetch");
+  }
+}
+const fetchWishlistByID = async (req,res)=>{
+  try{
+    const wishlist = await Wishlist.findOne({$and:[{user_id:req.userId},{ngo_id:req.params.id}]})
+    sendSuccessResponse(res, wishlist, "Wishlist fetched successfully");
+  }catch(error){
+    sendErrorResponse(res, error, "Wishlist failed to fetch");
+  }
+}
 module.exports = {
   ngoRegister,
   userRegister,
@@ -209,5 +226,7 @@ module.exports = {
   getNgo,
   getUserDetail,
   addToWishlist,
-  getDonationHistory
+  getDonationHistory,
+  fetchWishlistByUser,
+  fetchWishlistByID
 };

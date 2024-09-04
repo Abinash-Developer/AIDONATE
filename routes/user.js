@@ -27,6 +27,8 @@ router.get('/get_user_detail',authMiddleware.verifyToken,userController.getUserD
 
 // Wishlist Route
 router.get('/add-to-wishlist/:id',authMiddleware.verifyToken,userController.addToWishlist);
+router.get('/fetch-wishlist-explore/',authMiddleware.verifyToken,userController.fetchWishlistByUser);
+router.get('/fetch-wishlist-ByID/:id',authMiddleware.verifyToken,userController.fetchWishlistByID);
  
 //Usre account API
 router.get('/get-donation-history/:id',authMiddleware.verifyToken,userController.getDonationHistory);
