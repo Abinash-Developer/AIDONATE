@@ -62,3 +62,10 @@ exports.verifyToken = (req, res, next)=> {
     next();
   });
 }
+exports.conditionalAuth = (req, res, next) => {
+  if (req.headers.authorization) {
+    return authMiddleware.verifyToken(req, res, next);
+  } else {
+    return next();
+  }
+};

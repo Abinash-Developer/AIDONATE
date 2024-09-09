@@ -117,7 +117,7 @@ const getNgo = async (req,res)=>{
                 $expr: {
                   $eq: [
                     { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
-                    req.query.date
+                      req.query.date
                   ]
                 }
               }
