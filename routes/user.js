@@ -29,6 +29,8 @@ router.get('/get_user_detail',authMiddleware.verifyToken,userController.getUserD
 router.get('/add-to-wishlist/:id',authMiddleware.verifyToken,userController.addToWishlist);
 router.get('/fetch-wishlist-explore/',authMiddleware.verifyToken,userController.fetchWishlistByUser);
 router.get('/fetch-wishlist-ByID/:id',authMiddleware.verifyToken,userController.fetchWishlistByID);
+router.get('/fetch-wishlist-ByIndividualUser/',authMiddleware.verifyToken,userController.fetchWishlistByIndividualUser);
+router.get('/remove-wishlist/:id',authMiddleware.verifyToken,userController.removeWishlist);
  
 //Usre account API
 router.get('/get-donation-history/:id',authMiddleware.verifyToken,userController.getDonationHistory);

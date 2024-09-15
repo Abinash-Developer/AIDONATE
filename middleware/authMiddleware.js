@@ -54,6 +54,7 @@ exports.verifyToken = (req, res, next)=> {
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
   }
+  // console.log("token = ",token)
   jwt.verify(token, 'aidonate', (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Failed to authenticate token' });
@@ -64,7 +65,7 @@ exports.verifyToken = (req, res, next)=> {
 }
 exports.conditionalAuth = (req, res, next) => {
   if (req.headers.authorization) {
-    return authMiddleware.verifyToken(req, res, next);
+    return exports.verifyToken(req, res, next);
   } else {
     return next();
   }

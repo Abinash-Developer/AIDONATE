@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const {
   sendSuccessResponse,
   handleMongoError,
-  sendErrorResponse
+  sendErrorResponse,
 } = require("../helpers/responseHelper");
 const ngoRegister = async (req, res) => {
   try {
@@ -23,7 +23,7 @@ const ngoRegister = async (req, res) => {
       district: req.body.district,
       pincode: req.body.pinCode,
       password: req.body.password,
-      role: req.body.role
+      role: req.body.role,
     });
     const registerResponse = await user.save();
     const metaData = {
@@ -35,10 +35,10 @@ const ngoRegister = async (req, res) => {
     handleMongoError(error, res);
   }
 };
-const userRegister = async (req,res)=>{
+const userRegister = async (req, res) => {
   // console.log(req.body);
   // return;
-  try{
+  try {
     var user = new User({
       first_name: req.body.firstName || req.body.firstName,
       last_name: req.body.lastName || req.body.lastName,
@@ -47,15 +47,15 @@ const userRegister = async (req,res)=>{
       state: req.body.state || req.body.state,
       district: req.body.district || req.body.district,
       pincode: req.body.pinCode || req.body.pinCode,
-      password:req.body.password || req.body.password,
-      role:req.body.role,
+      password: req.body.password || req.body.password,
+      role: req.body.role,
     });
     const registerResponse = await user.save();
     sendSuccessResponse(res, registerResponse, "user registered successfully");
-  }catch(error){
+  } catch (error) {
     handleMongoError(error, res);
   }
-}
+};
 const userSignIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -90,7 +90,7 @@ const userSignIn = async (req, res) => {
 };
 
 const saveUserMeta = async (userId, metaData) => {
-  const metaEntries = Object.keys(metaData).map(key => ({
+  const metaEntries = Object.keys(metaData).map((key) => ({
     meta_id: userId,
     meta_key: key,
     meta_value: JSON.stringify(metaData[key]),
@@ -102,85 +102,89 @@ const signToken = (id) => {
   return jwt.sign({ id }, "aidonate", { expiresIn: "1d" });
 };
 
-
 // NGO SECTION
-const getNgo = async (req,res)=>{
-  try{
+const getNgo = async (req, res) => {
+  try {
     const date = req.query.date ? new Date(req.query.date) : null;
     const ngos = await User.find({
-      $and:  [
-        { status: 'active' },
-        { role: 'ngo' },
+      $and: [
+        { status: "active" },
+        { role: "ngo" },
         ...(req.query.date
           ? [
               {
                 $expr: {
                   $eq: [
-                    { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
-                      req.query.date
-                  ]
-                }
-              }
+                    {
+                      $dateToString: {
+                        format: "%Y-%m-%d",
+                        date: "$created_at",
+                      },
+                    },
+                    req.query.date,
+                  ],
+                },
+              },
             ]
-          : [])
-      ]
+          : []),
+      ],
     });
-  const sums = await Payment.aggregate([
-    {
-      $group: {
-        _id: '$charity_id',
-        totalAmount: { $sum: { $toDouble: '$amount' } }
+    const sums = await Payment.aggregate([
+      {
+        $group: {
+          _id: "$charity_id",
+          totalAmount: { $sum: { $toDouble: "$amount" } },
+        },
+      },
+    ]);
+    const paymentMap = {};
+    sums.forEach((payment) => {
+      paymentMap[payment._id.toString()] = payment.totalAmount;
+    });
+    var ngoArray = [];
+    for (const ngo of ngos) {
+      const ngoObject = ngo.toObject();
+      const ngoId = ngoObject._id.toString();
+      if (paymentMap.hasOwnProperty(ngoId)) {
+        ngoObject.paymentAmount = paymentMap[ngoId];
+        const goalAmount = await UserMeta.findOne({
+          meta_id: ngoId,
+          meta_key: "goal",
+        });
+        const goalValue = parseFloat(goalAmount.meta_value);
+        const amountPaid = parseFloat(ngoObject.paymentAmount);
+        var percentage = (amountPaid / goalValue) * 100;
+        ngoObject.percentage = parseInt(percentage);
+      } else {
+        ngoObject.paymentAmount = 0;
+        ngoObject.percentage = 0;
       }
+      ngoArray.push(ngoObject);
     }
-  ]);
-const paymentMap = {};
-sums.forEach(payment => {
-  paymentMap[payment._id.toString()] = payment.totalAmount;
-});
-var ngoArray = [];
-for (const ngo of ngos) {
-  const ngoObject = ngo.toObject();
-  const ngoId = ngoObject._id.toString(); 
-  if (paymentMap.hasOwnProperty(ngoId)) {
-      ngoObject.paymentAmount = paymentMap[ngoId];
-      const goalAmount = await UserMeta.findOne({
-        meta_id: ngoId,
-        meta_key: 'goal'
-      });
-      const goalValue = parseFloat(goalAmount.meta_value);
-      const amountPaid = parseFloat(ngoObject.paymentAmount);
-      var percentage = (amountPaid / goalValue) * 100;
-      ngoObject.percentage = parseInt(percentage); 
-  }else{
-     ngoObject.paymentAmount = 0;
-     ngoObject.percentage=0;
-  }
-  ngoArray.push(ngoObject);
-}
-const sortOrder = req.query.price;
+    const sortOrder = req.query.price;
 
-ngoArray.sort((a, b) => {
-  if (sortOrder === 'asc') {
-    return a.paymentAmount - b.paymentAmount;
-  } else {
-    return b.paymentAmount - a.paymentAmount;
-  }
-});
-   sendSuccessResponse(res, ngoArray, "Ngo's are fetched successfully");
+    ngoArray.sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.paymentAmount - b.paymentAmount;
+      } else {
+        return b.paymentAmount - a.paymentAmount;
+      }
+    });
+    sendSuccessResponse(res, ngoArray, "Ngo's are fetched successfully");
   } catch (error) {
     sendErrorResponse(res, error, "Failed to fetch ngo's");
   }
-}
-const getUserDetail = async (req,res)=>{
-  try{
-    const userDetail = await User.findOne({_id:req.userId});
+};
+const getUserDetail = async (req, res) => {
+  try {
+    const userDetail = await User.findOne({ _id: req.userId });
     sendSuccessResponse(res, userDetail, "userDetail fetched successfully");
-  }catch(error){
+  } catch (error) {
     sendErrorResponse(res, error, "Failed to fetch user");
   }
-}
-const addToWishlist = async (req,res)=>{
-  const  ngo_id  = req.params.id;
+};
+const addToWishlist = async (req, res) => {
+  const ngo_id = req.params.id;
   const user_id = req.userId;
   try {
     const newWishlistItem = new Wishlist({
@@ -192,33 +196,65 @@ const addToWishlist = async (req,res)=>{
   } catch (error) {
     sendErrorResponse(res, error, "Failed to saved wishlist");
   }
-}
+};
 
-
-const getDonationHistory = async(req,res)=>{
-  try{
-    const donationHistory = await Payment.find({user_id:req.params.id}).populate('charity_id');
-    sendSuccessResponse(res, donationHistory, "Donation History fetched successfully");
-  }catch(error){
+const getDonationHistory = async (req, res) => {
+  try {
+    const donationHistory = await Payment.find({
+      user_id: req.params.id,
+    }).populate("charity_id");
+    sendSuccessResponse(
+      res,
+      donationHistory,
+      "Donation History fetched successfully"
+    );
+  } catch (error) {
     sendErrorResponse(res, error, "Failed to fetch user");
   }
-}
-const fetchWishlistByUser = async (req,res)=>{
-  try{
-    const wishlist = await Wishlist.find({user_id:req.userId})
+};
+const fetchWishlistByUser = async (req, res) => {
+  try {
+    const wishlist = await Wishlist.find({ user_id: req.userId });
     sendSuccessResponse(res, wishlist, "Wishlist fetched successfully");
-  }catch(error){
+  } catch (error) {
     sendErrorResponse(res, error, "Wishlist failed to fetch");
   }
-}
-const fetchWishlistByID = async (req,res)=>{
-  try{
-    const wishlist = await Wishlist.findOne({$and:[{user_id:req.userId},{ngo_id:req.params.id}]})
+};
+const fetchWishlistByID = async (req, res) => {
+  try {
+    const wishlist = await Wishlist.findOne({
+      $and: [{ user_id: req.userId }, { ngo_id: req.params.id }],
+    });
     sendSuccessResponse(res, wishlist, "Wishlist fetched successfully");
-  }catch(error){
+  } catch (error) {
     sendErrorResponse(res, error, "Wishlist failed to fetch");
   }
-}
+};
+const fetchWishlistByIndividualUser = async (req, res) => {
+  try {
+    const wishlist = await Wishlist.find({ user_id: req.userId }).populate(
+      "ngo_id"
+    );
+    sendSuccessResponse(res, wishlist, "Wishlist fetched successfully");
+  } catch (error) {
+    sendErrorResponse(res, error, "Wishlist failed to fetch");
+  }
+};
+const removeWishlist = async (req, res) => {
+  try {
+    const removeResult = await Wishlist.deleteOne({
+      $and: [{ user_id: req.userId }, { ngo_id: req.params.id }],
+    });
+    if (removeResult.deletedCount == 1) {
+      res.status(200).json({
+        status: true,
+        message: "wishlist",
+      });
+    }
+  } catch (error) {
+    sendErrorResponse(res, error, "Wishlist deleted failed");
+  }
+};
 module.exports = {
   ngoRegister,
   userRegister,
@@ -228,5 +264,7 @@ module.exports = {
   addToWishlist,
   getDonationHistory,
   fetchWishlistByUser,
-  fetchWishlistByID
+  fetchWishlistByID,
+  fetchWishlistByIndividualUser,
+  removeWishlist,
 };
